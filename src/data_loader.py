@@ -142,8 +142,9 @@ class DataLoader:
         df = df.dropna(subset=[self.text_column, self.summary_column])
 
         # Remove rows where text or summary is empty string
-        df = df[df[self.text_column].astype(str).str.strip().str.len() > 0]
-        df = df[df[self.summary_column].astype(str).str.strip().str.len() > 0]
+        mask_text = df[self.text_column].astype(str).str.strip().str.len() > 0
+        mask_summary = df[self.summary_column].astype(str).str.strip().str.len() > 0
+        df = df.loc[mask_text & mask_summary]
 
         # Ensure text columns are strings
         df[self.text_column] = df[self.text_column].astype(str)
