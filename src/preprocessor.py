@@ -87,7 +87,7 @@ class TextPreprocessor:
             from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
             factory = StemmerFactory()
-            self.stemmer = factory.createStemmer()
+            self.stemmer = factory.create_stemmer()
             logger.info("PySastrawi stemmer initialized successfully")
         except ImportError:
             logger.warning(

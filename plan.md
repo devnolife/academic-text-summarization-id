@@ -267,4 +267,4 @@ Best Method:    [Extractive / Abstractive]
 - **Always** check if a fine-tuned model checkpoint already exists before re-training
 - **Always** validate dataset columns before starting the pipeline
 - The extractive model must **never** require GPU — it must run on CPU only
-- The abstractive model must **gracefully fallback** to CPU if GPU is not available
+- The abstractive model must **gracefully fallback** to CPU if GPU is not **available**
