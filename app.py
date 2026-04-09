@@ -176,16 +176,17 @@ def preprocess():
             step6 = preprocessor.stem_tokens(step5)
 
             results.append({
-                "original": original[:500] + ("..." if len(original) > 500 else ""),
-                "case_folding": step1[:500] + ("..." if len(step1) > 500 else ""),
-                "cleaning": step2[:500] + ("..." if len(step2) > 500 else ""),
-                "sentences": step3[:10],
-                "word_tokens": step4[:50],
-                "after_stopword_removal": step5[:50],
-                "after_stemming": step6[:50],
+                "original": original,
+                "case_folding": step1,
+                "cleaning": step2,
+                "sentences": step3,
+                "word_tokens": step4,
+                "after_stopword_removal": step5,
+                "after_stemming": step6,
                 "num_sentences": len(step3),
                 "num_tokens_before": len(step4),
                 "num_tokens_after": len(step5),
+                "num_tokens_stemmed": len(step6),
             })
 
         return jsonify({"success": True, "results": results})
@@ -416,7 +417,7 @@ def evaluate():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/load-default", methods=["POST"])
+@app.route("/api/load-default", methods=["GET", "POST"])
 def load_default_dataset():
     """Load the default dataset from data/raw/dataset.csv."""
     try:
@@ -486,16 +487,17 @@ def process_single_text():
         step6 = preprocessor.stem_tokens(step5)
 
         result["preprocessing"] = {
-            "original": text[:500] + ("..." if len(text) > 500 else ""),
-            "case_folding": step1[:500] + ("..." if len(step1) > 500 else ""),
-            "cleaning": step2[:500] + ("..." if len(step2) > 500 else ""),
-            "sentences": step3[:10],
-            "word_tokens": step4[:50],
-            "after_stopword_removal": step5[:50],
-            "after_stemming": step6[:50],
+            "original": text,
+            "case_folding": step1,
+            "cleaning": step2,
+            "sentences": step3,
+            "word_tokens": step4,
+            "after_stopword_removal": step5,
+            "after_stemming": step6,
             "num_sentences": len(step3),
             "num_tokens_before": len(step4),
             "num_tokens_after": len(step5),
+            "num_tokens_stemmed": len(step6),
         }
 
         # Step 2: Summarization
