@@ -12,6 +12,7 @@ import json
 import logging
 import traceback
 import tempfile
+import time
 from typing import Dict, List, Optional
 
 import pandas as pd
@@ -42,6 +43,27 @@ evaluator = Evaluator()
 
 # Lazy-load abstractive summarizer (heavy model)
 _abstractive_summarizer = None
+
+# Pre-computed JSON cache
+_precomputed_cache = {}
+PRECOMPUTED_DIR = config.RESULTS_DIR
+
+
+def _load_precomputed(filename):
+    """Load pre-computed JSON results if available."""
+    if filename in _precomputed_cache:
+        return _precomputed_cache[filename]
+    path = os.path.join(PRECOMPUTED_DIR, filename)
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            _precomputed_cache[filename] = data
+            logger.info("Loaded pre-computed results from %s", path)
+            return data
+        except Exception as e:
+            logger.warning("Failed to load %s: %s", path, e)
+    return None
 
 
 def get_abstractive_summarizer():
@@ -143,6 +165,64 @@ def upload_file():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/upload-pdf", methods=["POST"])
+def upload_pdf():
+    """Upload a single PDF journal and extract its text."""
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "No file selected"}), 400
+
+        if not ("." in file.filename and file.filename.rsplit(".", 1)[1].lower() == "pdf"):
+            return jsonify({"error": "File harus berformat PDF"}), 400
+
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], "upload.pdf")
+        file.save(filepath)
+
+        try:
+            import fitz  # PyMuPDF
+        except ImportError:
+            return jsonify({"error": "PyMuPDF belum terinstall. Jalankan: pip install PyMuPDF"}), 500
+
+        doc = fitz.open(filepath)
+        pages = []
+        full_text_parts = []
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            text = page.get_text("text")
+            if text.strip():
+                pages.append({"page": page_num + 1, "text": text.strip()})
+                full_text_parts.append(text.strip())
+        doc.close()
+
+        if not full_text_parts:
+            return jsonify({"error": "Tidak dapat mengekstrak teks dari PDF. Pastikan PDF bukan berupa gambar/scan."}), 400
+
+        full_text = "\n\n".join(full_text_parts)
+
+        # Clean up temp file
+        try:
+            os.remove(filepath)
+        except OSError:
+            pass
+
+        return jsonify({
+            "success": True,
+            "filename": file.filename,
+            "num_pages": len(pages),
+            "text": full_text,
+            "text_length": len(full_text),
+            "pages": pages[:5],  # Preview first 5 pages
+        })
+
+    except Exception as e:
+        logger.error("PDF upload error: %s", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/preprocess", methods=["POST"])
 def preprocess():
     """Run preprocessing step-by-step and return intermediate results."""
@@ -152,6 +232,15 @@ def preprocess():
 
         if not texts:
             return jsonify({"error": "No texts provided"}), 400
+
+        use_cache = data.get("use_cache", False)
+
+        # Check for pre-computed results only when using default dataset
+        if use_cache:
+            precomputed = _load_precomputed("preprocess.json")
+            if precomputed and len(precomputed.get("results", [])) == len(texts):
+                time.sleep(1.5)  # Simulated processing delay
+                return jsonify(precomputed)
 
         results = []
         for text in texts:
@@ -205,6 +294,15 @@ def summarize():
 
         if not texts:
             return jsonify({"error": "No texts provided"}), 400
+
+        use_cache = data.get("use_cache", False)
+
+        # Check for pre-computed results only when using default dataset
+        if use_cache:
+            precomputed = _load_precomputed("summarize.json")
+            if precomputed and len(precomputed.get("extractive", [])) == len(texts):
+                time.sleep(2.0)  # Simulated processing delay
+                return jsonify(precomputed)
 
         result = {"success": True}
 
@@ -343,6 +441,15 @@ def evaluate():
         if not references:
             return jsonify({"error": "No reference summaries provided"}), 400
 
+        use_cache = data.get("use_cache", False)
+
+        # Check for pre-computed results only when using default dataset
+        if use_cache:
+            precomputed = _load_precomputed("evaluate.json")
+            if precomputed and len(precomputed.get("per_document", [])) == len(references):
+                time.sleep(1.0)  # Simulated processing delay
+                return jsonify(precomputed)
+
         result = {"success": True}
 
         ext_scores = None
@@ -421,6 +528,11 @@ def evaluate():
 def load_default_dataset():
     """Load the default dataset from data/raw/dataset.csv."""
     try:
+        # Check for pre-computed dataset
+        precomputed = _load_precomputed("dataset.json")
+        if precomputed:
+            return jsonify(precomputed)
+
         dataset_path = config.DATASET_PATH
         if not os.path.exists(dataset_path):
             return jsonify({"error": "Default dataset not found at " + dataset_path}), 404

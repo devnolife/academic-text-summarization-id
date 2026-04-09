@@ -87,7 +87,7 @@
             <!-- Visual Flow -->
             <div class="bg-dark-50 border border-dark-200 rounded-2xl p-8 mb-8">
                 <div class="flex flex-col lg:flex-row items-center justify-center gap-4">
-                    <div class="flow-node min-w-[140px]"><i data-lucide="file-input" class="w-6 h-6 mx-auto mb-2 text-dark-500"></i><p class="text-sm font-semibold">Input Dokumen</p><p class="text-[10px] text-dark-400 mt-1">CSV / Teks Manual</p></div>
+                    <div class="flow-node min-w-[140px]"><i data-lucide="file-input" class="w-6 h-6 mx-auto mb-2 text-dark-500"></i><p class="text-sm font-semibold">Input Dokumen</p><p class="text-[10px] text-dark-400 mt-1">CSV / PDF / Teks Manual</p></div>
                     <div class="text-dark-400"><i data-lucide="arrow-right" class="w-5 h-5 hidden lg:block"></i><i data-lucide="arrow-down" class="w-5 h-5 lg:hidden"></i></div>
                     <div class="flow-node min-w-[140px] border-purple-300 bg-purple-50"><i data-lucide="settings-2" class="w-6 h-6 mx-auto mb-2 text-purple-600"></i><p class="text-sm font-semibold text-purple-900">Preprocessing</p><p class="text-[10px] text-purple-600 mt-1">6 tahap pembersihan</p></div>
                     <div class="text-dark-400"><i data-lucide="arrow-right" class="w-5 h-5 hidden lg:block"></i><i data-lucide="arrow-down" class="w-5 h-5 lg:hidden"></i></div>
@@ -140,9 +140,10 @@
         </div>
         <!-- INPUT -->
         <section id="input-section" class="mb-8">
-            <div class="text-center mb-6"><h2 class="text-xl font-bold">Masukkan Data</h2><p class="text-dark-500 text-sm mt-1">Upload dataset CSV atau input teks manual untuk memulai</p></div>
+            <div class="text-center mb-6"><h2 class="text-xl font-bold">Masukkan Data</h2><p class="text-dark-500 text-sm mt-1">Upload dataset CSV, upload PDF jurnal, atau input teks manual untuk memulai</p></div>
             <div class="flex justify-center mb-6"><div class="inline-flex bg-dark-100 rounded-full p-1">
                 <button onclick="switchTab('upload')" id="tab-upload" class="tab-btn px-5 py-2 rounded-full text-sm font-medium bg-dark-900 text-white flex items-center gap-2 transition-all"><i data-lucide="upload" class="w-4 h-4"></i> Upload CSV</button>
+                <button onclick="switchTab('pdf')" id="tab-pdf" class="tab-btn px-5 py-2 rounded-full text-sm font-medium text-dark-600 flex items-center gap-2 transition-all"><i data-lucide="file-text" class="w-4 h-4"></i> Upload PDF</button>
                 <button onclick="switchTab('manual')" id="tab-manual" class="tab-btn px-5 py-2 rounded-full text-sm font-medium text-dark-600 flex items-center gap-2 transition-all"><i data-lucide="pencil-line" class="w-4 h-4"></i> Input Manual</button>
             </div></div>
             <div id="panel-upload" class="tab-panel max-w-3xl mx-auto">
@@ -157,6 +158,23 @@
                 <div id="file-info" class="hidden mt-4 p-4 border border-dark-200 rounded-lg fade-in">
                     <div class="flex items-center justify-between"><div class="flex items-center gap-3"><i data-lucide="file-spreadsheet" class="w-5 h-5 text-dark-600"></i><div><p class="font-medium text-sm" id="file-name">-</p><p class="text-xs text-dark-400" id="file-stats">-</p></div></div><button onclick="clearFile()" class="text-dark-400 hover:text-dark-900"><i data-lucide="x" class="w-4 h-4"></i></button></div>
                     <div id="preview-table" class="mt-4 overflow-x-auto"></div>
+                </div>
+            </div>
+            <div id="panel-pdf" class="tab-panel hidden max-w-3xl mx-auto">
+                <div id="pdf-drop-zone" class="border-2 border-dashed border-dark-300 rounded-xl p-12 text-center cursor-pointer hover:border-dark-500 transition-colors" ondrop="handlePdfDrop(event)" ondragover="handleDragOver(event)" ondragleave="handlePdfDragLeave(event)" onclick="document.getElementById('pdf-file-input').click()">
+                    <i data-lucide="file-text" class="w-12 h-12 mx-auto text-dark-400 mb-4"></i>
+                    <p class="font-medium mb-1">Drag & drop file PDF jurnal di sini</p>
+                    <p class="text-dark-400 text-sm">atau klik untuk browse file</p>
+                    <p class="text-dark-300 text-xs mt-2">Upload 1 file PDF jurnal, teks akan diekstrak otomatis</p>
+                    <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" onchange="handlePdfFileSelect(event)">
+                </div>
+                <div id="pdf-file-info" class="hidden mt-4 p-4 border border-dark-200 rounded-lg fade-in">
+                    <div class="flex items-center justify-between"><div class="flex items-center gap-3"><i data-lucide="file-text" class="w-5 h-5 text-dark-600"></i><div><p class="font-medium text-sm" id="pdf-file-name">-</p><p class="text-xs text-dark-400" id="pdf-file-stats">-</p></div></div><button onclick="clearPdf()" class="text-dark-400 hover:text-dark-900"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+                    <div id="pdf-preview" class="mt-4"></div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1.5 flex items-center gap-1.5"><i data-lucide="bookmark" class="w-4 h-4"></i> Ringkasan Referensi <span class="text-dark-400 font-normal">(opsional, untuk evaluasi ROUGE)</span></label>
+                    <textarea id="pdf-reference" rows="4" placeholder="Paste abstrak/ringkasan referensi di sini (opsional)..." class="w-full border border-dark-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-dark-900 resize-y"></textarea>
                 </div>
             </div>
             <div id="panel-manual" class="tab-panel hidden max-w-3xl mx-auto">
@@ -259,7 +277,7 @@
         lucide.createIcons();
     }
 
-    let appState = { texts: [], summaries: [], currentDocIndex: 0, currentTab: 'upload', file: null, preprocessResult: null, summarizeResult: null, evaluateResult: null };
+    let appState = { texts: [], summaries: [], currentDocIndex: 0, currentTab: 'upload', file: null, preprocessResult: null, summarizeResult: null, evaluateResult: null, isDefaultDataset: false };
 
     // --- SCROLL INDICATOR ---
     window.addEventListener('scroll', () => { const h = document.documentElement; const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100; document.getElementById('scroll-indicator').style.width = pct + '%'; });
@@ -290,6 +308,7 @@
             appState.file = file;
             appState.texts = data.texts;
             appState.summaries = data.summaries || [];
+            appState.isDefaultDataset = false;
             showFileInfo(file.name, data);
             showToast('Dataset berhasil di-load: ' + data.num_documents + ' dokumen', 'success');
         }).catch(e => { setLoading('btn-start', false); showToast('Error upload: ' + e.message); });
@@ -305,6 +324,7 @@
             switchTab('upload');
             appState.texts = data.texts;
             appState.summaries = data.summaries || [];
+            appState.isDefaultDataset = true;
             showFileInfo('dataset.csv (default)', data);
             showToast('Dataset default berhasil di-load: ' + data.num_documents + ' dokumen', 'success');
         }).catch(e => { btn.textContent = 'Atau gunakan dataset contoh (dataset.csv)'; btn.disabled = false; showToast('Error: ' + e.message); });
@@ -323,6 +343,43 @@
         }
     }
     function clearFile() { document.getElementById('file-info').classList.add('hidden'); appState.file = null; appState.texts = []; appState.summaries = []; document.getElementById('file-input').value = ''; }
+
+    // --- PDF HANDLING ---
+    function handlePdfDragLeave(e) { e.preventDefault(); document.getElementById('pdf-drop-zone').classList.remove('drag-active'); }
+    function handlePdfDrop(e) { e.preventDefault(); document.getElementById('pdf-drop-zone').classList.remove('drag-active'); const f = e.dataTransfer.files[0]; if(f) uploadPdf(f); }
+    function handlePdfFileSelect(e) { const f = e.target.files[0]; if(f) uploadPdf(f); }
+
+    function uploadPdf(file) {
+        if(!file.name.toLowerCase().endsWith('.pdf')) { showToast('File harus berformat PDF'); return; }
+        const fd = new FormData(); fd.append('file', file);
+        setLoading('btn-start', true);
+        fetch('/api/upload-pdf', { method: 'POST', body: fd })
+        .then(r => r.json()).then(data => {
+            setLoading('btn-start', false);
+            if(data.error) return showToast(data.error);
+            appState.file = file;
+            appState.texts = [data.text];
+            appState.summaries = [];
+            appState.isDefaultDataset = false;
+            showPdfInfo(data);
+            showToast('PDF berhasil diekstrak: ' + data.num_pages + ' halaman', 'success');
+        }).catch(e => { setLoading('btn-start', false); showToast('Error upload PDF: ' + e.message); });
+    }
+
+    function showPdfInfo(data) {
+        document.getElementById('pdf-file-info').classList.remove('hidden');
+        document.getElementById('pdf-file-name').textContent = data.filename;
+        document.getElementById('pdf-file-stats').textContent = data.num_pages + ' halaman • ' + data.text_length + ' karakter';
+        let html = '<div class="bg-dark-50 border border-dark-200 rounded-lg p-3 max-h-60 overflow-y-auto"><p class="text-xs text-dark-500 mb-2 font-semibold">Preview teks yang diekstrak:</p><p class="text-sm text-dark-700 whitespace-pre-wrap">' + escapeHtml(data.text.substring(0, 2000)) + (data.text.length > 2000 ? '...' : '') + '</p></div>';
+        document.getElementById('pdf-preview').innerHTML = html;
+        lucide.createIcons();
+    }
+
+    function clearPdf() {
+        document.getElementById('pdf-file-info').classList.add('hidden');
+        appState.file = null; appState.texts = []; appState.summaries = [];
+        document.getElementById('pdf-file-input').value = '';
+    }
 
     // --- TOAST ---
     function showToast(msg, type='error') {
@@ -394,6 +451,11 @@
     async function startPipeline() {
         // Validate
         if(appState.currentTab === 'upload' && appState.texts.length === 0) return showToast('Upload dataset CSV terlebih dahulu');
+        if(appState.currentTab === 'pdf' && appState.texts.length === 0) return showToast('Upload file PDF terlebih dahulu');
+        if(appState.currentTab === 'pdf') {
+            const ref = document.getElementById('pdf-reference').value.trim();
+            if(ref) appState.summaries = [ref];
+        }
         if(appState.currentTab === 'manual') {
             const txt = document.getElementById('input-text').value.trim();
             if(!txt) return showToast('Masukkan teks dokumen terlebih dahulu');
@@ -436,7 +498,7 @@
             body = JSON.stringify({ texts: [txt] });
         } else {
             url = '/api/preprocess';
-            body = JSON.stringify({ texts: appState.texts });
+            body = JSON.stringify({ texts: appState.texts, use_cache: appState.isDefaultDataset });
         }
         const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
         const data = await resp.json();
@@ -535,7 +597,7 @@
     // --- STEP 2: SUMMARIZATION ---
     async function doSummarization() {
         document.getElementById('status-summarization').innerHTML = '<div class="spinner"></div>';
-        const resp = await fetch('/api/summarize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texts: appState.texts }) });
+        const resp = await fetch('/api/summarize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texts: appState.texts, use_cache: appState.isDefaultDataset }) });
         const data = await resp.json();
         if(data.error) throw new Error(data.error);
         appState.summarizeResult = data;
@@ -662,7 +724,7 @@
             return;
         }
 
-        const payload = { references: refs };
+        const payload = { references: refs, use_cache: appState.isDefaultDataset };
         if(extPreds.length > 0) payload.extractive_preds = extPreds;
         if(absPreds.length > 0) payload.abstractive_preds = absPreds;
 

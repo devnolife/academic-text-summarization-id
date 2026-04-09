@@ -143,6 +143,8 @@ class AbstractiveSummarizer:
         self.max_source_length = max_source_length or config.MAX_SOURCE_LENGTH
         self.max_target_length = max_target_length or config.MAX_TARGET_LENGTH
         self.num_beams = num_beams or config.NUM_BEAMS
+        self.min_target_length = getattr(config, 'MIN_TARGET_LENGTH', 30)
+        self.length_penalty = getattr(config, 'LENGTH_PENALTY', 1.5)
 
         # Determine device — graceful GPU fallback
         if torch.cuda.is_available():
@@ -165,41 +167,39 @@ class AbstractiveSummarizer:
         """
         Load the pre-trained model and tokenizer from HuggingFace.
 
-        Tries online first, then falls back to local cache if network
-        requests fail (e.g. HTTP 429 rate-limit).
+        Tries local cache first for speed, then falls back to online.
         """
         from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
         logger.info("Loading model and tokenizer: %s", self.model_name)
 
+        # Try local cache first (avoids network timeout delays when offline)
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
-            self.model.to(self.device)
+            import huggingface_hub.constants
+            original_offline = huggingface_hub.constants.HF_HUB_OFFLINE
+            huggingface_hub.constants.HF_HUB_OFFLINE = True
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    self.model_name, local_files_only=True
+                )
+                self.model = AutoModelForSeq2SeqLM.from_pretrained(
+                    self.model_name, local_files_only=True
+                )
+                self.model.to(self.device)
+                logger.info("Model loaded from local cache.")
+            finally:
+                huggingface_hub.constants.HF_HUB_OFFLINE = original_offline
         except Exception as e:
             logger.warning(
-                "Online loading failed (%s). Trying offline cache...", e
+                "Local cache loading failed (%s). Trying online...", e
             )
             try:
-                # Force full offline mode by patching the constant directly.
-                # Setting os.environ alone is insufficient because
-                # huggingface_hub caches the value at import time.
-                import huggingface_hub.constants
-                original_offline = huggingface_hub.constants.HF_HUB_OFFLINE
-                huggingface_hub.constants.HF_HUB_OFFLINE = True
-                try:
-                    self.tokenizer = AutoTokenizer.from_pretrained(
-                        self.model_name, local_files_only=True
-                    )
-                    self.model = AutoModelForSeq2SeqLM.from_pretrained(
-                        self.model_name, local_files_only=True
-                    )
-                    self.model.to(self.device)
-                finally:
-                    huggingface_hub.constants.HF_HUB_OFFLINE = original_offline
+                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+                self.model.to(self.device)
             except Exception as e2:
                 logger.error(
-                    "Failed to load model %s from cache: %s", self.model_name, e2
+                    "Failed to load model %s: %s", self.model_name, e2
                 )
                 raise
 
@@ -382,7 +382,9 @@ class AbstractiveSummarizer:
                 input_ids=inputs["input_ids"],
                 attention_mask=inputs["attention_mask"],
                 max_length=self.max_target_length,
+                min_length=self.min_target_length,
                 num_beams=self.num_beams,
+                length_penalty=self.length_penalty,
                 early_stopping=True,
                 no_repeat_ngram_size=3,
             )
