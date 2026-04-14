@@ -204,9 +204,10 @@ def compute_summarize_json(texts):
     logger.info("  Running abstractive summarization (this may take a few minutes)...")
     abs_model = AbstractiveSummarizer()
     checkpoint_path = os.path.join(config.MODEL_CHECKPOINT_DIR, "best_model")
-    if os.path.exists(checkpoint_path):
+    if os.path.exists(checkpoint_path) and os.path.exists(os.path.join(checkpoint_path, "model.safetensors")):
         abs_model._load_checkpoint(checkpoint_path)
     else:
+        logger.info("  No fine-tuned checkpoint found, loading base model from HuggingFace...")
         abs_model._load_model()
 
     start = time.time()

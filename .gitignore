@@ -3,10 +3,7 @@ output/checkpoints/best_model/model.safetensors
 output/checkpoints/best_model/tokenizer.json
 output/checkpoints/best_model/training_args.bin
 
-# Large precomputed results
-output/results/preprocess.json
-output/results/summarize.json
-output/results/dataset.json
+
 
 # Python
 __pycache__/
