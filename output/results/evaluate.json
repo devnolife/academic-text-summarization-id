@@ -1,0 +1,842 @@
+{
+  "success": true,
+  "extractive_scores": {
+    "rouge1": {
+      "precision": 0.09674022397600444,
+      "recall": 0.4376818174907756,
+      "fmeasure": 0.1569653239346852
+    },
+    "rouge2": {
+      "precision": 0.026006326032960915,
+      "recall": 0.11738068579167651,
+      "fmeasure": 0.042008476747036255
+    },
+    "rougeL": {
+      "precision": 0.07091438288567727,
+      "recall": 0.31685441510673706,
+      "fmeasure": 0.11465636370576686
+    }
+  },
+  "abstractive_scores": {
+    "rouge1": {
+      "precision": 0.34302805317133733,
+      "recall": 0.4189172953734469,
+      "fmeasure": 0.37064406978157627
+    },
+    "rouge2": {
+      "precision": 0.1773494057182878,
+      "recall": 0.21906068137555007,
+      "fmeasure": 0.19254103871192713
+    },
+    "rougeL": {
+      "precision": 0.27157428296582914,
+      "recall": 0.3399417112291995,
+      "fmeasure": 0.2972317236660915
+    }
+  },
+  "per_document": [
+    {
+      "doc_id": 0,
+      "reference_preview": "Said al-Shihri, yang digambarkan sebagai orang kedua di al-Qaeda Semenanjung Arab, AQAP, dilaporkan tewas dalam sebuah operasi di Yaman.",
+      "extractive_preview": "al shihri seorang warga arab saudi dibebaskan as dari penjara guantanamo pada tahun . sumber resmi di yaman kepada bbc mengatakan kematian al shihri d",
+      "ext": {
+        "rouge1": {
+          "p": 0.1008,
+          "r": 0.5714,
+          "f": 0.1714
+        },
+        "rouge2": {
+          "p": 0.0339,
+          "r": 0.2,
+          "f": 0.058
+        },
+        "rougeL": {
+          "p": 0.0756,
+          "r": 0.4286,
+          "f": 0.1286
+        }
+      },
+      "abstractive_preview": "Seorang militan al-Qaeda, Said al-Shihri, tewas dalam sebuah serangan udara di Yaman, demikian keterangan resmi militer Yaman kepada BBC, tetapi belum",
+      "abs": {
+        "rouge1": {
+          "p": 0.4,
+          "r": 0.4762,
+          "f": 0.4348
+        },
+        "rouge2": {
+          "p": 0.25,
+          "r": 0.3,
+          "f": 0.2727
+        },
+        "rougeL": {
+          "p": 0.32,
+          "r": 0.381,
+          "f": 0.3478
+        }
+      }
+    },
+    {
+      "doc_id": 1,
+      "reference_preview": "Sedikitnya tiga partai, yaitu PKS, PAN dan Golkar, sudah menjadwalkan dan melakukan acara pemutaran film Pengkhiatanan G30S/PKI. Langkah yang, oleh se",
+      "extractive_preview": "berlomba lomba bagi pengamat politik dan direktur lembaga survei indonesia dodi ambardi karena fakta fakta seputar peristiwa tak pernah tereksplorasi ",
+      "ext": {
+        "rouge1": {
+          "p": 0.0763,
+          "r": 0.3,
+          "f": 0.1216
+        },
+        "rouge2": {
+          "p": 0.0,
+          "r": 0.0,
+          "f": 0.0
+        },
+        "rougeL": {
+          "p": 0.0508,
+          "r": 0.2,
+          "f": 0.0811
+        }
+      },
+      "abstractive_preview": "Sejumlah partai politik sudah menggelar acara menonton film Pengkhianatan G30S/PKI di Jakarta Utara, Kamis (21/9) lalu. Namun, sejumlah anggota DPR da",
+      "abs": {
+        "rouge1": {
+          "p": 0.2121,
+          "r": 0.2333,
+          "f": 0.2222
+        },
+        "rouge2": {
+          "p": 0.0312,
+          "r": 0.0345,
+          "f": 0.0328
+        },
+        "rougeL": {
+          "p": 0.1818,
+          "r": 0.2,
+          "f": 0.1905
+        }
+      }
+    },
+    {
+      "doc_id": 2,
+      "reference_preview": "Mahkamah Agung AS telah menunda eksekusi tiga orang terpidana mati yang mengatakan bahwa penggunaan obat penenang midazolam untuk prosedur tersebut ad",
+      "extractive_preview": "suntik mati dengan midazolam dinilai membuat narapidana kesakitan hakim mengatakan kota oklahoma tidak bisa mengeksekusi richard glossip john grant da",
+      "ext": {
+        "rouge1": {
+          "p": 0.1,
+          "r": 0.5217,
+          "f": 0.1678
+        },
+        "rouge2": {
+          "p": 0.0,
+          "r": 0.0,
+          "f": 0.0
+        },
+        "rougeL": {
+          "p": 0.05,
+          "r": 0.2609,
+          "f": 0.0839
+        }
+      },
+      "abstractive_preview": "Mahkamah Agung Amerika Serikat telah menunda eksekusi tiga terpidana mati dengan suntikan mematikan berisi midazolam hingga setelah proses hukum telah",
+      "abs": {
+        "rouge1": {
+          "p": 0.36,
+          "r": 0.3913,
+          "f": 0.375
+        },
+        "rouge2": {
+          "p": 0.2083,
+          "r": 0.2273,
+          "f": 0.2174
+        },
+        "rougeL": {
+          "p": 0.36,
+          "r": 0.3913,
+          "f": 0.375
+        }
+      }
+    },
+    {
+      "doc_id": 3,
+      "reference_preview": "Penyerang Borussia Dortmund yang sedang naik daun, Robert Lewandowski, hampir dapat dipastikan gagal pindah ke Bayern Muenchen pada periode transfer t",
+      "extractive_preview": "robert lewandowski jelas tidak akan pindah ke bayern muenchen pada kata watzke kepada surat kabar jerman bild. pintu ke bayern sudah tertutup karena t",
+      "ext": {
+        "rouge1": {
+          "p": 0.1268,
+          "r": 0.4091,
+          "f": 0.1935
+        },
+        "rouge2": {
+          "p": 0.0714,
+          "r": 0.2381,
+          "f": 0.1099
+        },
+        "rougeL": {
+          "p": 0.1268,
+          "r": 0.4091,
+          "f": 0.1935
+        }
+      },
+      "abstractive_preview": "Penyerang Borussia Dortmund, Robert Lewandowski, jelas tidak akan pindah ke Bayern Muenchen pada 2013 karena tidak mengajukan penawaran tertulis dari ",
+      "abs": {
+        "rouge1": {
+          "p": 0.3571,
+          "r": 0.4545,
+          "f": 0.4
+        },
+        "rouge2": {
+          "p": 0.2593,
+          "r": 0.3333,
+          "f": 0.2917
+        },
+        "rougeL": {
+          "p": 0.3571,
+          "r": 0.4545,
+          "f": 0.4
+        }
+      }
+    },
+    {
+      "doc_id": 4,
+      "reference_preview": "Pematung Inggris Anish Kapoor membela diri terkait karyanya yang dipamerkan di istana Versailles Perancis, yang banyak dikecam sebagai karya yang \"kot",
+      "extractive_preview": "patung raksasa vagina yang merupakan bagian dari suatu karya instalasi instalasi yang disebut pojok kotor itu dipasang di taman di pekarangan istana. ",
+      "ext": {
+        "rouge1": {
+          "p": 0.1373,
+          "r": 0.6087,
+          "f": 0.224
+        },
+        "rouge2": {
+          "p": 0.0198,
+          "r": 0.0909,
+          "f": 0.0325
+        },
+        "rougeL": {
+          "p": 0.0686,
+          "r": 0.3043,
+          "f": 0.112
+        }
+      },
+      "abstractive_preview": "Karya perupa India, Anish Kapoor, yang memasang sebuah vagina raksasa di Istana Versailles, Prancis, dikritik oleh sejumlah turis Jerman dan Jerman ka",
+      "abs": {
+        "rouge1": {
+          "p": 0.32,
+          "r": 0.3478,
+          "f": 0.3333
+        },
+        "rouge2": {
+          "p": 0.125,
+          "r": 0.1364,
+          "f": 0.1304
+        },
+        "rougeL": {
+          "p": 0.28,
+          "r": 0.3043,
+          "f": 0.2917
+        }
+      }
+    },
+    {
+      "doc_id": 5,
+      "reference_preview": "Rusia tidak akan bertanding pada Paralimpiade Rio bulan depan setelah bandingnya ditolak terkait larangan doping yang didukung pemerintah.",
+      "extractive_preview": "mahkamah arbitrase olahraga cas mendukung larangan komite paralimpiade internasional ipc bagi semua atlit rusia untuk berpartisipasi di paralimpiade .",
+      "ext": {
+        "rouge1": {
+          "p": 0.0909,
+          "r": 0.4444,
+          "f": 0.1509
+        },
+        "rouge2": {
+          "p": 0.0115,
+          "r": 0.0588,
+          "f": 0.0192
+        },
+        "rougeL": {
+          "p": 0.0568,
+          "r": 0.2778,
+          "f": 0.0943
+        }
+      },
+      "abstractive_preview": "Para atlet Rusia tidak akan bertanding di Paralimpiade 2016 di Rio de Janeiro setelah Mahkamah Arbitrase Olahraga memutuskan untuk melarang Rusia untu",
+      "abs": {
+        "rouge1": {
+          "p": 0.2812,
+          "r": 0.5,
+          "f": 0.36
+        },
+        "rouge2": {
+          "p": 0.0968,
+          "r": 0.1765,
+          "f": 0.125
+        },
+        "rougeL": {
+          "p": 0.25,
+          "r": 0.4444,
+          "f": 0.32
+        }
+      }
+    },
+    {
+      "doc_id": 6,
+      "reference_preview": "Sebanyak empat warga negara Indonesia yang disandera di Filipina sejak 15 April lalu telah dibebaskan, kata Presiden Joko Widodo.",
+      "extractive_preview": "empat wni itu adalah anak buah kapal tunda tb henry dan kapal tongkang cristi yang dibajak pada april lalu. alhamdulillah akhirnya empat wni yang disa",
+      "ext": {
+        "rouge1": {
+          "p": 0.1184,
+          "r": 0.4737,
+          "f": 0.1895
+        },
+        "rouge2": {
+          "p": 0.0267,
+          "r": 0.1111,
+          "f": 0.043
+        },
+        "rougeL": {
+          "p": 0.0789,
+          "r": 0.3158,
+          "f": 0.1263
+        }
+      },
+      "abstractive_preview": "Presiden Joko Widodo membebaskan empat WNI yang disandera kelompok panyandera di Filipina sejak 15 Maret lalu, seperti disampaikan oleh juru bicara Pr",
+      "abs": {
+        "rouge1": {
+          "p": 0.44,
+          "r": 0.5789,
+          "f": 0.5
+        },
+        "rouge2": {
+          "p": 0.25,
+          "r": 0.3333,
+          "f": 0.2857
+        },
+        "rougeL": {
+          "p": 0.36,
+          "r": 0.4737,
+          "f": 0.4091
+        }
+      }
+    },
+    {
+      "doc_id": 7,
+      "reference_preview": "Militer AS menerbangkan dua pesawat pembom B-52 diatas wilayah udara di Laut Cina Selatan yang disengketakan dan memunculkan kesan menantang klaim Cin",
+      "extractive_preview": "pada sabtu cina menetapkan zona pertahanan wilayah udara di tempat itu dan mewajibkan pesawat mana pun yang melintas mengindahkan aturan buatannya ata",
+      "ext": {
+        "rouge1": {
+          "p": 0.1053,
+          "r": 0.4615,
+          "f": 0.1714
+        },
+        "rouge2": {
+          "p": 0.0177,
+          "r": 0.08,
+          "f": 0.029
+        },
+        "rougeL": {
+          "p": 0.0702,
+          "r": 0.3077,
+          "f": 0.1143
+        }
+      },
+      "abstractive_preview": "Amerika Serikat mengatakan dua pesawat militernya melintasi wilayah udara yang disengketakan antara Jepang dan Korea setelah Cina mengindahkan aturan ",
+      "abs": {
+        "rouge1": {
+          "p": 0.2667,
+          "r": 0.3077,
+          "f": 0.2857
+        },
+        "rouge2": {
+          "p": 0.1034,
+          "r": 0.12,
+          "f": 0.1111
+        },
+        "rougeL": {
+          "p": 0.2667,
+          "r": 0.3077,
+          "f": 0.2857
+        }
+      }
+    },
+    {
+      "doc_id": 8,
+      "reference_preview": "Warga Filipina bersiap menghadapi Topan Hagupit yang akan menerjang sebagian pulau di negara itu pada Sabtu (6/12) mendatang.",
+      "extractive_preview": "masyarakat setempat menyiapkan stok perbekalan untuk menghadapi datangnya topan hagupit hagupit yang sedang melaju di samudera pasifik diprediksi baka",
+      "ext": {
+        "rouge1": {
+          "p": 0.0748,
+          "r": 0.4211,
+          "f": 0.127
+        },
+        "rouge2": {
+          "p": 0.0283,
+          "r": 0.1667,
+          "f": 0.0484
+        },
+        "rougeL": {
+          "p": 0.0654,
+          "r": 0.3684,
+          "f": 0.1111
+        }
+      },
+      "abstractive_preview": "Pihak berwenang Filipina mengatakan mereka telah melaksanakan perintah evakuasi setelah Topan Hagupit menerjang kota Tacloban, Filipina Tengah, hari M",
+      "abs": {
+        "rouge1": {
+          "p": 0.1429,
+          "r": 0.2105,
+          "f": 0.1702
+        },
+        "rouge2": {
+          "p": 0.037,
+          "r": 0.0556,
+          "f": 0.0444
+        },
+        "rougeL": {
+          "p": 0.1429,
+          "r": 0.2105,
+          "f": 0.1702
+        }
+      }
+    },
+    {
+      "doc_id": 9,
+      "reference_preview": "Menjelang pemberlakuan kembali pembatasan sosial berskala besar (PSBB) seperti diterapkan pada awal pandemi Covid-19, DKI Jakarta mencatat 1.274 kasus",
+      "extractive_preview": "krl dan pasar tradisional akan diawasi ketat selama masa perpanjangan psbb di jakarta hingga juli dalam jumpa pers dinas kesehatan pemprov dki jakarta",
+      "ext": {
+        "rouge1": {
+          "p": 0.1091,
+          "r": 0.3077,
+          "f": 0.1611
+        },
+        "rouge2": {
+          "p": 0.0092,
+          "r": 0.0263,
+          "f": 0.0136
+        },
+        "rougeL": {
+          "p": 0.0818,
+          "r": 0.2308,
+          "f": 0.1208
+        }
+      },
+      "abstractive_preview": "DKI Jakarta kembali memperpanjang masa transisi Pembatasan Sosial Berskala Besar (PSBB) untuk ketiga kalinya sampai dengan tanggal 13 Agustus 2020. Na",
+      "abs": {
+        "rouge1": {
+          "p": 0.2667,
+          "r": 0.2051,
+          "f": 0.2319
+        },
+        "rouge2": {
+          "p": 0.1724,
+          "r": 0.1316,
+          "f": 0.1493
+        },
+        "rougeL": {
+          "p": 0.2333,
+          "r": 0.1795,
+          "f": 0.2029
+        }
+      }
+    },
+    {
+      "doc_id": 10,
+      "reference_preview": "Sebuah pemberitahuan dari Kementerian Pendidikan China telah menyebabkan kehebohan setelah menyatakan para pemuda di negara itu terlalu \"feminin\". Pes",
+      "extractive_preview": "sudah beberapa lama ini pemerintah china telah mengisyaratkan keprihatinan bahwa panutan panutan laki laki paling populer di negara itu tidak lagi mer",
+      "ext": {
+        "rouge1": {
+          "p": 0.13,
+          "r": 0.3333,
+          "f": 0.1871
+        },
+        "rouge2": {
+          "p": 0.0808,
+          "r": 0.2105,
+          "f": 0.1168
+        },
+        "rougeL": {
+          "p": 0.11,
+          "r": 0.2821,
+          "f": 0.1583
+        }
+      },
+      "abstractive_preview": "Pemerintah China meminta sekolah-sekolah untuk sepenuhnya mereformasi pendidikan jasmani dan memperkuat perekrutan guru-guru. Namun, apa yang akan dil",
+      "abs": {
+        "rouge1": {
+          "p": 0.1429,
+          "r": 0.1026,
+          "f": 0.1194
+        },
+        "rouge2": {
+          "p": 0.0,
+          "r": 0.0,
+          "f": 0.0
+        },
+        "rougeL": {
+          "p": 0.0714,
+          "r": 0.0513,
+          "f": 0.0597
+        }
+      }
+    },
+    {
+      "doc_id": 11,
+      "reference_preview": "Facebook meminta maaf telah menghapus sejumlah akun para pengguna yang terdiri dari kaum transgender dan waria karena dianggap melanggar kebijakan pen",
+      "extractive_preview": "kaum lgbt di san fransisco hari ini akan berunjuk rasa memprotes facebook saat ini facebook menyerukan orang orang untuk menggunakan nama asli yang me",
+      "ext": {
+        "rouge1": {
+          "p": 0.0902,
+          "r": 0.5217,
+          "f": 0.1538
+        },
+        "rouge2": {
+          "p": 0.0303,
+          "r": 0.1818,
+          "f": 0.0519
+        },
+        "rougeL": {
+          "p": 0.0752,
+          "r": 0.4348,
+          "f": 0.1282
+        }
+      },
+      "abstractive_preview": "Facebook meminta maaf kepada kaum transgender dan waria yang menggunakan nama asli mereka di dunia daring karena melanggar kebijakan perusahaan itu, k",
+      "abs": {
+        "rouge1": {
+          "p": 0.4483,
+          "r": 0.5652,
+          "f": 0.5
+        },
+        "rouge2": {
+          "p": 0.25,
+          "r": 0.3182,
+          "f": 0.28
+        },
+        "rougeL": {
+          "p": 0.3448,
+          "r": 0.4348,
+          "f": 0.3846
+        }
+      }
+    },
+    {
+      "doc_id": 12,
+      "reference_preview": "Pengadilan kasus KTP elektronik yang menghebohkan itu digelar untuk kedua kalinya, kali ini menghadirkan bekas Menteri dalam Negeri Gamawan Fauzi, seb",
+      "extractive_preview": "satu rupiah pun saya tidak penah menerima kata gamawan fauzi dengan menyembut nama tuhan dalam sidang lanjutan ektp di pengadilan tipikor jakarta pusa",
+      "ext": {
+        "rouge1": {
+          "p": 0.09,
+          "r": 0.4091,
+          "f": 0.1475
+        },
+        "rouge2": {
+          "p": 0.0101,
+          "r": 0.0476,
+          "f": 0.0167
+        },
+        "rougeL": {
+          "p": 0.04,
+          "r": 0.1818,
+          "f": 0.0656
+        }
+      },
+      "abstractive_preview": "Mantan Menteri Keuangan Gamawan Fauzi mengaku 'tidak penah menerima satu sen' terkait proyek pengadaan KTP elektronik atau e-KTP, yang dianggap salah ",
+      "abs": {
+        "rouge1": {
+          "p": 0.1935,
+          "r": 0.2727,
+          "f": 0.2264
+        },
+        "rouge2": {
+          "p": 0.0667,
+          "r": 0.0952,
+          "f": 0.0784
+        },
+        "rougeL": {
+          "p": 0.0968,
+          "r": 0.1364,
+          "f": 0.1132
+        }
+      }
+    },
+    {
+      "doc_id": 13,
+      "reference_preview": "Setahun setelah deklarasi pembentukan kekhalifahan ISIS oleh Abu Bakr al-Baghdadi, kelompok tersebut masih kuat, walaupun sudah diserang berulang kali",
+      "extractive_preview": "dengan mempraktikkan teori itu isis dapat bertahan di lokasi yang dianggap menjadi markas mereka raqqa di suriah dan mosul di irak. dengan strategi it",
+      "ext": {
+        "rouge1": {
+          "p": 0.0417,
+          "r": 0.1538,
+          "f": 0.0656
+        },
+        "rouge2": {
+          "p": 0.0,
+          "r": 0.0,
+          "f": 0.0
+        },
+        "rougeL": {
+          "p": 0.0417,
+          "r": 0.1538,
+          "f": 0.0656
+        }
+      },
+      "abstractive_preview": "Walaupun sudah diserang berulang kali oleh Amerika Serikat dan sekutu-sekutunya, kelompok yang menamakan diri Negara Islam (ISIS) masih kuat. Namun, a",
+      "abs": {
+        "rouge1": {
+          "p": 0.5769,
+          "r": 0.5769,
+          "f": 0.5769
+        },
+        "rouge2": {
+          "p": 0.44,
+          "r": 0.44,
+          "f": 0.44
+        },
+        "rougeL": {
+          "p": 0.4231,
+          "r": 0.4231,
+          "f": 0.4231
+        }
+      }
+    },
+    {
+      "doc_id": 14,
+      "reference_preview": "Sebuah video eksperimen sosial yang menampilkan dua 'orang gay' bergandengan tangan di jalan Moskow, Rusia, menarik perhatian pengguna internet global",
+      "extractive_preview": "dalam video tersebut dua orang pemuda yang tampak bergandengan tangan melewati daerah daerah terkenal di pusta kota mendapat umpatan dan perlakuan kas",
+      "ext": {
+        "rouge1": {
+          "p": 0.1053,
+          "r": 0.6,
+          "f": 0.1791
+        },
+        "rouge2": {
+          "p": 0.0265,
+          "r": 0.1579,
+          "f": 0.0455
+        },
+        "rougeL": {
+          "p": 0.0702,
+          "r": 0.4,
+          "f": 0.1194
+        }
+      },
+      "abstractive_preview": "Sebuah video eksperimen yang menampilkan dua orang gay di pusat kota Moskow, Rusia, menimbulkan perdebatan besar di dunia maya tentang bagaimana negar",
+      "abs": {
+        "rouge1": {
+          "p": 0.3548,
+          "r": 0.55,
+          "f": 0.4314
+        },
+        "rouge2": {
+          "p": 0.2333,
+          "r": 0.3684,
+          "f": 0.2857
+        },
+        "rougeL": {
+          "p": 0.3548,
+          "r": 0.55,
+          "f": 0.4314
+        }
+      }
+    },
+    {
+      "doc_id": 15,
+      "reference_preview": "Anak-anak yang diadopsi dari Indonesia pada era 1980-an menyebut permintaan maaf pemerintah Belanda atas pelanggaran serius dalam proses adopsi mereka",
+      "extractive_preview": "anak anak yang diadopsi dari indonesia yang diadopsi oleh pasangan belanda pada era an hingga kini masih kesulitan mencari orang tua kandung mereka. d",
+      "ext": {
+        "rouge1": {
+          "p": 0.1173,
+          "r": 0.575,
+          "f": 0.1949
+        },
+        "rouge2": {
+          "p": 0.0564,
+          "r": 0.2821,
+          "f": 0.094
+        },
+        "rougeL": {
+          "p": 0.0918,
+          "r": 0.45,
+          "f": 0.1525
+        }
+      },
+      "abstractive_preview": "Pemerintah Belanda meminta maaf atas pelanggaran yang dilakukan oleh pasangan Belanda dalam proses adopsi anak-anak dari Indonesia pada era 1980-an hi",
+      "abs": {
+        "rouge1": {
+          "p": 0.7419,
+          "r": 0.575,
+          "f": 0.6479
+        },
+        "rouge2": {
+          "p": 0.4,
+          "r": 0.3077,
+          "f": 0.3478
+        },
+        "rougeL": {
+          "p": 0.3548,
+          "r": 0.275,
+          "f": 0.3099
+        }
+      }
+    },
+    {
+      "doc_id": 16,
+      "reference_preview": "QPR masih terus melakukan pembicaraan dengan Chelsea guna mendapatkan pemain belakang asal Brasil, Alex.",
+      "extractive_preview": "alex menginginkan pindah dari chelsea dan bermain di luar inggris. manajer chelsea andre villas boas yakin bahwa kesepakatan tentang kepindahan alex k",
+      "ext": {
+        "rouge1": {
+          "p": 0.0556,
+          "r": 0.3571,
+          "f": 0.0962
+        },
+        "rouge2": {
+          "p": 0.0112,
+          "r": 0.0769,
+          "f": 0.0196
+        },
+        "rougeL": {
+          "p": 0.0556,
+          "r": 0.3571,
+          "f": 0.0962
+        }
+      },
+      "abstractive_preview": "Chelsea dan Queens Park Rangers telah mencapai kesepakatan tentang kepindahan pemain tengah Alex dari Chelsea ke klub lain, Rangers. Namun nilai trans",
+      "abs": {
+        "rouge1": {
+          "p": 0.1429,
+          "r": 0.2857,
+          "f": 0.1905
+        },
+        "rouge2": {
+          "p": 0.0,
+          "r": 0.0,
+          "f": 0.0
+        },
+        "rougeL": {
+          "p": 0.1071,
+          "r": 0.2143,
+          "f": 0.1429
+        }
+      }
+    },
+    {
+      "doc_id": 17,
+      "reference_preview": "Presiden Joko Widodo telah mengumumkan tanggal 1 Juni sebagai hari lahir Pancasila sekaligus sebagai hari libur nasional.",
+      "extractive_preview": "dalam bagian lain pidatonya jokowi mengatakan mensyukuri indonesia memiliki pancasila dan membandingkan kondisi di sejumlah negara yang disebutnya ten",
+      "ext": {
+        "rouge1": {
+          "p": 0.0847,
+          "r": 0.2941,
+          "f": 0.1316
+        },
+        "rouge2": {
+          "p": 0.0345,
+          "r": 0.125,
+          "f": 0.0541
+        },
+        "rougeL": {
+          "p": 0.0847,
+          "r": 0.2941,
+          "f": 0.1316
+        }
+      },
+      "abstractive_preview": "Presiden Joko Widodo mengumumkan tanggal 1 Juni ditetapkan sebagai hari libur dan hari lahir Pancasila, dalam pidato sambutan peringatan Pidato Bung K",
+      "abs": {
+        "rouge1": {
+          "p": 0.3939,
+          "r": 0.7647,
+          "f": 0.52
+        },
+        "rouge2": {
+          "p": 0.2812,
+          "r": 0.5625,
+          "f": 0.375
+        },
+        "rougeL": {
+          "p": 0.3333,
+          "r": 0.6471,
+          "f": 0.44
+        }
+      }
+    },
+    {
+      "doc_id": 18,
+      "reference_preview": "Konser khusus yang akan mempertemukan Jason Donovan dan Kylie Minogue di atas panggung untuk kedua kalinya dalam 20 tahun dibatalkan.",
+      "extractive_preview": "jason donovan dan kylie minogue terakhir tampil bersama tahun lalu pete waterman mengatakan acara di hyde park london yang dijadwalkan rabu tidak bisa",
+      "ext": {
+        "rouge1": {
+          "p": 0.1019,
+          "r": 0.55,
+          "f": 0.1719
+        },
+        "rouge2": {
+          "p": 0.0374,
+          "r": 0.2105,
+          "f": 0.0635
+        },
+        "rougeL": {
+          "p": 0.0741,
+          "r": 0.4,
+          "f": 0.125
+        }
+      },
+      "abstractive_preview": "Konser Jason Donovan dan Kylie Minogue di luar ruangan harus dibatalkan karena cuaca buruk, kata juru bicara festival musik itu, Pete Waterman, yang a",
+      "abs": {
+        "rouge1": {
+          "p": 0.3571,
+          "r": 0.5,
+          "f": 0.4167
+        },
+        "rouge2": {
+          "p": 0.2222,
+          "r": 0.3158,
+          "f": 0.2609
+        },
+        "rougeL": {
+          "p": 0.2857,
+          "r": 0.4,
+          "f": 0.3333
+        }
+      }
+    },
+    {
+      "doc_id": 19,
+      "reference_preview": "Sejumlah rumah sakit di Kota Manaus, Brasil, mengalami kesulitan merawat pasien Covid-19, di tengah laporan kekurangan oksigen yang parah dan keputusa",
+      "extractive_preview": "kota di negara bagian amazonas itu mencatat lonjakan angka kematian dan penularan. inggris telah melarang pelancong dari sebagian besar amerika latin ",
+      "ext": {
+        "rouge1": {
+          "p": 0.0786,
+          "r": 0.44,
+          "f": 0.1333
+        },
+        "rouge2": {
+          "p": 0.0144,
+          "r": 0.0833,
+          "f": 0.0245
+        },
+        "rougeL": {
+          "p": 0.05,
+          "r": 0.28,
+          "f": 0.0848
+        }
+      },
+      "abstractive_preview": "Beberapa rumah sakit di Manaus, Brasil, telah \"kehabisan oksigen\" dan ribuan orang sekarat, seperti dilaporkan sejumlah laporan tentang kondisi keseha",
+      "abs": {
+        "rouge1": {
+          "p": 0.4615,
+          "r": 0.48,
+          "f": 0.4706
+        },
+        "rouge2": {
+          "p": 0.12,
+          "r": 0.125,
+          "f": 0.1224
+        },
+        "rougeL": {
+          "p": 0.3077,
+          "r": 0.32,
+          "f": 0.3137
+        }
+      }
+    }
+  ],
+  "extractive_avg_f1": 0.1045,
+  "abstractive_avg_f1": 0.2868,
+  "best_method": "Abstractive"
+}
