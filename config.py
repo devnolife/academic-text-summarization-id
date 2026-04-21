@@ -52,16 +52,18 @@ TFIDF_MAX_FEATURES = 5000  # Maximum number of TF-IDF features
 #   - "csebuetnlp/mT5_multilingual_XLSum-small" (fine-tuned for summarization, supports Indonesian)
 #   - "google/mt5-small" (raw pre-trained, needs fine-tuning first)
 #   - "LazarusNLP/IndoNanoT5-base" (Indonesian T5)
-ABSTRACTIVE_MODEL_NAME = "csebuetnlp/mT5_multilingual_XLSum"
-MAX_SOURCE_LENGTH = 512  # Max tokens for input text (tokenizer)
+ABSTRACTIVE_MODEL_NAME = "csebuetnlp/mT5_multilingual_XLSum"  # Fine-tuned for summarization (supports Indonesian)
+MAX_SOURCE_LENGTH = 256  # Max tokens for input text
 MAX_TARGET_LENGTH = 128  # Max tokens for generated summary
-NUM_BEAMS = 4  # Number of beams for beam search decoding
-BATCH_SIZE = 4  # Batch size for training and inference
+MIN_TARGET_LENGTH = 30   # Minimum tokens for generated summary
+NUM_BEAMS = 4  # Beam search for quality
+LENGTH_PENALTY = 1.5  # >1.0 encourages longer summaries
+BATCH_SIZE = 1  # Batch size for training and inference (1 for CPU)
 NUM_EPOCHS = 3  # Number of fine-tuning epochs
 LEARNING_RATE = 5e-5  # Learning rate for fine-tuning
 WEIGHT_DECAY = 0.01  # Weight decay for optimizer
-WARMUP_STEPS = 100  # Warmup steps for learning rate scheduler
-GRADIENT_ACCUMULATION_STEPS = 2  # Gradient accumulation steps
+WARMUP_STEPS = 0  # Warmup steps for learning rate scheduler
+GRADIENT_ACCUMULATION_STEPS = 4  # Accumulate gradients to save memory
 FP16 = False  # Use mixed precision training (requires GPU)
 
 # =============================================================================

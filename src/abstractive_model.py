@@ -143,6 +143,8 @@ class AbstractiveSummarizer:
         self.max_source_length = max_source_length or config.MAX_SOURCE_LENGTH
         self.max_target_length = max_target_length or config.MAX_TARGET_LENGTH
         self.num_beams = num_beams or config.NUM_BEAMS
+        self.min_target_length = getattr(config, 'MIN_TARGET_LENGTH', 30)
+        self.length_penalty = getattr(config, 'LENGTH_PENALTY', 1.5)
 
         # Determine device — graceful GPU fallback
         if torch.cuda.is_available():
@@ -165,24 +167,46 @@ class AbstractiveSummarizer:
         """
         Load the pre-trained model and tokenizer from HuggingFace.
 
-        Selects the appropriate model class based on the model name.
+        Tries local cache first for speed, then falls back to online.
         """
         from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
         logger.info("Loading model and tokenizer: %s", self.model_name)
 
+        # Try local cache first (avoids network timeout delays when offline)
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
-            self.model.to(self.device)
-
-            logger.info(
-                "Model loaded successfully. Parameters: %s",
-                f"{sum(p.numel() for p in self.model.parameters()):,}",
-            )
+            import huggingface_hub.constants
+            original_offline = huggingface_hub.constants.HF_HUB_OFFLINE
+            huggingface_hub.constants.HF_HUB_OFFLINE = True
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    self.model_name, local_files_only=True
+                )
+                self.model = AutoModelForSeq2SeqLM.from_pretrained(
+                    self.model_name, local_files_only=True
+                )
+                self.model.to(self.device)
+                logger.info("Model loaded from local cache.")
+            finally:
+                huggingface_hub.constants.HF_HUB_OFFLINE = original_offline
         except Exception as e:
-            logger.error("Failed to load model %s: %s", self.model_name, e)
-            raise
+            logger.warning(
+                "Local cache loading failed (%s). Trying online...", e
+            )
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+                self.model.to(self.device)
+            except Exception as e2:
+                logger.error(
+                    "Failed to load model %s: %s", self.model_name, e2
+                )
+                raise
+
+        logger.info(
+            "Model loaded successfully. Parameters: %s",
+            f"{sum(p.numel() for p in self.model.parameters()):,}",
+        )
 
     def _load_checkpoint(self, checkpoint_path: str) -> bool:
         """
@@ -277,13 +301,11 @@ class AbstractiveSummarizer:
             warmup_steps=config.WARMUP_STEPS,
             gradient_accumulation_steps=config.GRADIENT_ACCUMULATION_STEPS,
             eval_strategy="epoch",
-            save_strategy="epoch",
-            save_total_limit=2,
-            load_best_model_at_end=True,
+            save_strategy="no",
             predict_with_generate=True,
             generation_max_length=self.max_target_length,
             fp16=config.FP16 and torch.cuda.is_available(),
-            logging_dir=os.path.join(checkpoint_dir, "logs"),
+            dataloader_pin_memory=False,
             logging_steps=50,
             report_to="none",
             seed=config.RANDOM_SEED,
@@ -302,7 +324,7 @@ class AbstractiveSummarizer:
             args=training_args,
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
-            tokenizer=self.tokenizer,
+            processing_class=self.tokenizer,
             data_collator=data_collator,
         )
 
@@ -360,7 +382,9 @@ class AbstractiveSummarizer:
                 input_ids=inputs["input_ids"],
                 attention_mask=inputs["attention_mask"],
                 max_length=self.max_target_length,
+                min_length=self.min_target_length,
                 num_beams=self.num_beams,
+                length_penalty=self.length_penalty,
                 early_stopping=True,
                 no_repeat_ngram_size=3,
             )

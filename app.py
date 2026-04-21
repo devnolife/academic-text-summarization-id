@@ -12,10 +12,11 @@ import json
 import logging
 import traceback
 import tempfile
+import time
 from typing import Dict, List, Optional
 
 import pandas as pd
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file, redirect
 from flask_cors import CORS
 
 import config
@@ -43,6 +44,27 @@ evaluator = Evaluator()
 # Lazy-load abstractive summarizer (heavy model)
 _abstractive_summarizer = None
 
+# Pre-computed JSON cache
+_precomputed_cache = {}
+PRECOMPUTED_DIR = config.RESULTS_DIR
+
+
+def _load_precomputed(filename):
+    """Load pre-computed JSON results if available."""
+    if filename in _precomputed_cache:
+        return _precomputed_cache[filename]
+    path = os.path.join(PRECOMPUTED_DIR, filename)
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            _precomputed_cache[filename] = data
+            logger.info("Loaded pre-computed results from %s", path)
+            return data
+        except Exception as e:
+            logger.warning("Failed to load %s: %s", path, e)
+    return None
+
 
 def get_abstractive_summarizer():
     """Lazy-load the abstractive summarizer to avoid slow startup."""
@@ -66,6 +88,66 @@ def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+import re
+
+def _clean_pdf_text(text: str) -> str:
+    """Clean common PDF extraction artifacts from text."""
+    lines = text.split('\n')
+
+    # Detect repeated header/footer lines (appear 3+ times = page header/footer)
+    line_counts = {}
+    for line in lines:
+        stripped = line.strip()
+        if stripped and len(stripped) > 3:
+            line_counts[stripped] = line_counts.get(stripped, 0) + 1
+    repeated_lines = {l for l, c in line_counts.items() if c >= 3}
+
+    # Filter lines
+    cleaned = []
+    for line in lines:
+        stripped = line.strip()
+        # Skip repeated page headers/footers
+        if stripped in repeated_lines:
+            continue
+        # Skip standalone page numbers
+        if re.match(r'^\s*\d{1,4}\s*$', line):
+            continue
+        # Skip journal citation header, e.g. "JURNAL NAME, (2024), 2(1): 41-48"
+        if re.search(r'\(\d{4}\)\s*,?\s*\d+\s*\(\d+\)\s*:\s*\d+', stripped):
+            continue
+        # Skip DOI lines
+        if re.match(r'^\s*(https?://)?doi\.org\s*/\s*\S+', stripped, re.I):
+            continue
+        # Skip ISSN/DOI-only lines
+        if re.match(r'^\s*(e-?issn|p-?issn|issn|doi)\s*[:/]\s*\S+', stripped, re.I):
+            continue
+        # Skip standalone URLs
+        if re.match(r'^\s*https?://\S+\s*$', line):
+            continue
+        # Skip email lines (lines that are only email addresses)
+        if re.match(r'^\s*\*?\s*\S+@\S+\.\S+\s*$', line):
+            continue
+        # Skip "Volume X – Issue Y – YYYY" footer lines
+        if re.match(r'^\s*volume\s+\d+\s*[–—-]\s*issue\s+\d+\s*[–—-]\s*\d{4}\s*$', stripped, re.I):
+            continue
+        cleaned.append(line)
+
+    text = '\n'.join(cleaned)
+
+    # Remove reference/bibliography section at the end
+    text = re.sub(r'(?si)\n\s*(DAFTAR\s+PUSTAKA|REFERENSI|REFERENCES|BIBLIOGRAPHY)\s*\n.*$', '', text)
+
+    # Remove superscript numbers on author names/affiliations
+    # e.g. "Chairunnisa1, Ahmad Ari Masyhuri2" -> "Chairunnisa, Ahmad Ari Masyhuri"
+    # e.g. "1STKIP Kusumanegara" -> "STKIP Kusumanegara"
+    text = re.sub(r'(?<=[a-zA-Z])\d{1,2}(?=[\s,;])', '', text)   # trailing: Name1 -> Name
+    text = re.sub(r'(?m)^\s*\d{1,2}(?=[A-Z])', '', text)          # leading: 1STKIP -> STKIP
+
+    # Clean up excessive blank lines
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
+
+
 # =============================================================================
 # Routes
 # =============================================================================
@@ -74,6 +156,55 @@ def allowed_file(filename: str) -> bool:
 def index():
     """Serve the main web interface."""
     return render_template("index.html")
+
+
+@app.route("/analysis")
+def analysis():
+    """Serve the analysis dashboard page."""
+    return render_template("analysis.html")
+
+
+@app.route("/api/analysis-data")
+def analysis_data():
+    """Serve pre-computed JSON data for the analysis dashboard."""
+    data_type = request.args.get("type", "evaluate")
+    filename_map = {
+        "evaluate": "evaluate.json",
+        "dataset": "dataset.json",
+        "summarize": "summarize.json",
+    }
+    filename = filename_map.get(data_type)
+    if not filename:
+        return jsonify({"error": "Invalid type"}), 400
+
+    filepath = os.path.join(PRECOMPUTED_DIR, filename)
+    if not os.path.exists(filepath):
+        return jsonify({"error": f"{filename} not found. Run precompute.py first."}), 404
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        return f.read(), 200, {"Content-Type": "application/json"}
+
+
+@app.route("/detail/<step>")
+def detail(step):
+    """Serve the detail page for a specific pipeline step."""
+    titles = {
+        'preprocessing': 'Preprocessing',
+        'summarization': 'Summarization',
+        'evaluation': 'Evaluasi ROUGE'
+    }
+    if step not in titles:
+        return redirect('/')
+    return render_template("detail.html", step=step, step_title=titles[step])
+
+
+@app.route("/api/download-dataset")
+def download_dataset():
+    """Download the default dataset CSV file."""
+    dataset_path = config.DATASET_PATH
+    if not os.path.exists(dataset_path):
+        return jsonify({"error": "Dataset not found"}), 404
+    return send_file(dataset_path, as_attachment=True, download_name="dataset.csv")
 
 
 @app.route("/api/upload", methods=["POST"])
@@ -143,6 +274,84 @@ def upload_file():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/upload-pdf", methods=["POST"])
+def upload_pdf():
+    """Upload a single PDF journal and extract its text."""
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "No file selected"}), 400
+
+        if not ("." in file.filename and file.filename.rsplit(".", 1)[1].lower() == "pdf"):
+            return jsonify({"error": "File harus berformat PDF"}), 400
+
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], "upload.pdf")
+        file.save(filepath)
+
+        try:
+            import fitz  # PyMuPDF
+        except ImportError:
+            return jsonify({"error": "PyMuPDF belum terinstall. Jalankan: pip install PyMuPDF"}), 500
+
+        doc = fitz.open(filepath)
+        pages = []
+        full_text_parts = []
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            text = page.get_text("text")
+            if text.strip():
+                pages.append({"page": page_num + 1, "text": text.strip()})
+                full_text_parts.append(text.strip())
+        doc.close()
+
+        if not full_text_parts:
+            return jsonify({"error": "Tidak dapat mengekstrak teks dari PDF. Pastikan PDF bukan berupa gambar/scan."}), 400
+
+        full_text = "\n\n".join(full_text_parts)
+
+        # Apply PDF text filter
+        import re
+        full_text = _clean_pdf_text(full_text)
+
+        # Save extracted text to dataset.csv
+        dataset_path = config.DATASET_PATH
+        new_row = pd.DataFrame([{
+            config.TEXT_COLUMN: full_text,
+            config.SUMMARY_COLUMN: ""
+        }])
+        if os.path.exists(dataset_path):
+            df_existing = pd.read_csv(dataset_path)
+            df_updated = pd.concat([df_existing, new_row], ignore_index=True)
+        else:
+            df_updated = new_row
+        df_updated.to_csv(dataset_path, index=False)
+        logger.info("Saved PDF text to %s (total rows: %d)", dataset_path, len(df_updated))
+
+        # Clean up temp file
+        try:
+            os.remove(filepath)
+        except OSError:
+            pass
+
+        return jsonify({
+            "success": True,
+            "filename": file.filename,
+            "num_pages": len(pages),
+            "text": full_text,
+            "text_length": len(full_text),
+            "saved_to_dataset": True,
+            "dataset_total_rows": len(df_updated),
+            "pages": pages[:5],  # Preview first 5 pages
+        })
+
+    except Exception as e:
+        logger.error("PDF upload error: %s", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/preprocess", methods=["POST"])
 def preprocess():
     """Run preprocessing step-by-step and return intermediate results."""
@@ -152,6 +361,15 @@ def preprocess():
 
         if not texts:
             return jsonify({"error": "No texts provided"}), 400
+
+        use_cache = data.get("use_cache", False)
+
+        # Check for pre-computed results only when using default dataset
+        if use_cache:
+            precomputed = _load_precomputed("preprocess.json")
+            if precomputed and len(precomputed.get("results", [])) == len(texts):
+                time.sleep(1.5)  # Simulated processing delay
+                return jsonify(precomputed)
 
         results = []
         for text in texts:
@@ -176,16 +394,17 @@ def preprocess():
             step6 = preprocessor.stem_tokens(step5)
 
             results.append({
-                "original": original[:500] + ("..." if len(original) > 500 else ""),
-                "case_folding": step1[:500] + ("..." if len(step1) > 500 else ""),
-                "cleaning": step2[:500] + ("..." if len(step2) > 500 else ""),
-                "sentences": step3[:10],
-                "word_tokens": step4[:50],
-                "after_stopword_removal": step5[:50],
-                "after_stemming": step6[:50],
+                "original": original,
+                "case_folding": step1,
+                "cleaning": step2,
+                "sentences": step3,
+                "word_tokens": step4,
+                "after_stopword_removal": step5,
+                "after_stemming": step6,
                 "num_sentences": len(step3),
                 "num_tokens_before": len(step4),
                 "num_tokens_after": len(step5),
+                "num_tokens_stemmed": len(step6),
             })
 
         return jsonify({"success": True, "results": results})
@@ -204,6 +423,15 @@ def summarize():
 
         if not texts:
             return jsonify({"error": "No texts provided"}), 400
+
+        use_cache = data.get("use_cache", False)
+
+        # Check for pre-computed results only when using default dataset
+        if use_cache:
+            precomputed = _load_precomputed("summarize.json")
+            if precomputed and len(precomputed.get("extractive", [])) == len(texts):
+                time.sleep(2.0)  # Simulated processing delay
+                return jsonify(precomputed)
 
         result = {"success": True}
 
@@ -338,9 +566,19 @@ def evaluate():
         references = data.get("references", [])
         extractive_preds = data.get("extractive_preds")
         abstractive_preds = data.get("abstractive_preds")
+        llm_preds = data.get("llm_preds")
 
         if not references:
             return jsonify({"error": "No reference summaries provided"}), 400
+
+        use_cache = data.get("use_cache", False)
+
+        # Check for pre-computed results only when using default dataset
+        if use_cache:
+            precomputed = _load_precomputed("evaluate.json")
+            if precomputed and len(precomputed.get("per_document", [])) == len(references):
+                time.sleep(1.0)  # Simulated processing delay
+                return jsonify(precomputed)
 
         result = {"success": True}
 
@@ -384,13 +622,39 @@ def evaluate():
                     for m in config.ROUGE_METRICS
                 }
 
+            if llm_preds and i < len(llm_preds) and llm_preds[i]:
+                doc["llm_preview"] = llm_preds[i][:150]
+                sc = evaluator.scorer.score(references[i], llm_preds[i])
+                doc["llm"] = {
+                    m: {
+                        "p": round(sc[m].precision, 4),
+                        "r": round(sc[m].recall, 4),
+                        "f": round(sc[m].fmeasure, 4),
+                    }
+                    for m in config.ROUGE_METRICS
+                }
+
             per_document.append(doc)
 
         result["per_document"] = per_document
 
+        # Compute LLM aggregate ROUGE if provided
+        llm_scores = None
+        if llm_preds:
+            valid_pairs = [
+                (ref, pred)
+                for ref, pred in zip(references, llm_preds)
+                if pred
+            ]
+            if valid_pairs:
+                valid_refs, valid_preds = zip(*valid_pairs)
+                llm_scores = evaluator.compute_rouge(list(valid_preds), list(valid_refs))
+                result["llm_scores"] = llm_scores
+
         # Determine best method
         ext_avg = None
         abs_avg = None
+        llm_avg = None
         if extractive_preds and ext_scores:
             ext_avg = sum(
                 ext_scores[m]["fmeasure"] for m in config.ROUGE_METRICS
@@ -401,13 +665,22 @@ def evaluate():
                 abs_scores[m]["fmeasure"] for m in config.ROUGE_METRICS
             ) / len(config.ROUGE_METRICS)
             result["abstractive_avg_f1"] = round(abs_avg, 4)
+        if llm_preds and llm_scores:
+            llm_avg = sum(
+                llm_scores[m]["fmeasure"] for m in config.ROUGE_METRICS
+            ) / len(config.ROUGE_METRICS)
+            result["llm_avg_f1"] = round(llm_avg, 4)
 
-        if ext_avg is not None and abs_avg is not None:
-            result["best_method"] = "Extractive" if ext_avg >= abs_avg else "Abstractive"
-        elif ext_avg is not None:
-            result["best_method"] = "Extractive"
-        elif abs_avg is not None:
-            result["best_method"] = "Abstractive"
+        # Find best among available methods
+        methods = {}
+        if ext_avg is not None:
+            methods["Extractive"] = ext_avg
+        if abs_avg is not None:
+            methods["Abstractive"] = abs_avg
+        if llm_avg is not None:
+            methods["LLM"] = llm_avg
+        if methods:
+            result["best_method"] = max(methods, key=methods.get)
 
         return jsonify(result)
 
@@ -416,10 +689,15 @@ def evaluate():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/load-default", methods=["POST"])
+@app.route("/api/load-default", methods=["GET", "POST"])
 def load_default_dataset():
     """Load the default dataset from data/raw/dataset.csv."""
     try:
+        # Check for pre-computed dataset
+        precomputed = _load_precomputed("dataset.json")
+        if precomputed:
+            return jsonify(precomputed)
+
         dataset_path = config.DATASET_PATH
         if not os.path.exists(dataset_path):
             return jsonify({"error": "Default dataset not found at " + dataset_path}), 404
@@ -486,16 +764,17 @@ def process_single_text():
         step6 = preprocessor.stem_tokens(step5)
 
         result["preprocessing"] = {
-            "original": text[:500] + ("..." if len(text) > 500 else ""),
-            "case_folding": step1[:500] + ("..." if len(step1) > 500 else ""),
-            "cleaning": step2[:500] + ("..." if len(step2) > 500 else ""),
-            "sentences": step3[:10],
-            "word_tokens": step4[:50],
-            "after_stopword_removal": step5[:50],
-            "after_stemming": step6[:50],
+            "original": text,
+            "case_folding": step1,
+            "cleaning": step2,
+            "sentences": step3,
+            "word_tokens": step4,
+            "after_stopword_removal": step5,
+            "after_stemming": step6,
             "num_sentences": len(step3),
             "num_tokens_before": len(step4),
             "num_tokens_after": len(step5),
+            "num_tokens_stemmed": len(step6),
         }
 
         # Step 2: Summarization
